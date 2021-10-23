@@ -1,8 +1,15 @@
+#include "xyla/util.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <sysexits.h>
 
 int
-main (int argc, char *argv[])
+main (int argc, char **argv)
 {
-    printf ("Usage: xyla [file]\n");
-    return 0;
+    if (argc > 1) {
+        fprintf (stderr, "Usage: xyla [file]");
+        exit (EX_USAGE);
+    }
+    char *file = read_file (argv[1]);
+    printf ("%s", file);
 }
