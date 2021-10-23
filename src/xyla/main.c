@@ -4,10 +4,10 @@
 #include <sysexits.h>
 
 int
-main (int argc, char **argv)
+main (int argc, const char **argv)
 {
-    if (argc > 1) {
-        fprintf (stderr, "Usage: xyla [file]");
+    if (argc > 1 || argv[1] == NULL) {
+        fprintf (stderr, "Usage: xyla [file]\n");
         exit (EX_USAGE);
     }
     char *file = read_file (argv[1]);
