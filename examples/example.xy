@@ -1,0 +1,44 @@
+// Declaring variables
+var = 10
+
+// If, else if and else
+when {
+    // If
+    var > 5 -> print("greater than 5")
+    // Else if
+    var < 5 -> print("less than 5")
+    // else
+    _ -> print("equal to 5")
+}
+
+// Only an if without an else
+when 
+    var > 5 -> print("do_something")
+
+// Declaring a function
+name a b = print(a + b)
+
+// Calling a function
+name(1, 2)
+
+// While loop
+a = 1
+loop a <= 100 {
+    print(a)
+    a += 1
+}
+
+// For loop
+loop x in 1..100 {
+    print(x)
+}
+
+// Factorial of a number
+factorial num = {
+    total = 1
+    loop x in 1..num
+        total *= x
+    return total
+}
+
+print(factorial(10))
