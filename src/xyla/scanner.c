@@ -21,3 +21,25 @@ scanner_new (const char *file)
     scanner.line = 1;
     source = file;
 }
+
+bool
+scanner_at_end ()
+{
+    return scanner.current == strlen (source);
+}
+
+char
+scanner_advance ()
+{
+    return source[scanner.current++];
+}
+
+Token
+scanner_make_token (TokenType token)
+{
+    return (Token){ .type = token,
+                    .start = scanner.start,
+                    .length = scanner.current - scanner.start,
+                    .line = scanner.line };
+}
+
