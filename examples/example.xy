@@ -12,7 +12,7 @@ when {
 }
 
 // Only an if without an else
-when 
+when
     var > 5 -> print("do_something")
 
 // Declaring a function
