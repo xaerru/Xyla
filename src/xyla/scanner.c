@@ -1,4 +1,5 @@
 #include "xyla/scanner.h"
+#include "xyla/util.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -123,12 +124,28 @@ scanner_type_string ()
 }
 
 Token
+scanner_type_number ()
+{
+    while (is_digit ((scanner_peek ())))
+        scanner_advance ();
+
+    if (scanner_peek () == '.' && is_digit (scanner_peek_ahead ())) {
+        scanner_advance ();
+        while (is_digit (scanner_peek ()))
+            scanner_advance ();
+    }
+
+    return scanner_create_token (TOKEN_NUMBER);
+}
+Token
 scanner_scan_token ()
 {
     scanner_skip_whitespace ();
     if (scanner_at_end ())
         return scanner_create_token (TOKEN_EOF);
     char c = scanner_advance ();
+    if (is_digit (c))
+        return scanner_type_number ();
     switch (c) {
         SCAN_SINGLE ('(', TOKEN_LEFT_PAREN);
         SCAN_SINGLE (')', TOKEN_RIGHT_PAREN);
