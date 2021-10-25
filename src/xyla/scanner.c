@@ -35,6 +35,28 @@ scanner_at_end ()
     return *scanner.current == '\0';
 }
 
+bool
+scanner_match (char expected)
+{
+    if (scanner_at_end ())
+        return false;
+    return *scanner.current == expected;
+}
+
+char
+scanner_peek ()
+{
+    return *scanner.current;
+}
+
+char
+scanner_peek_ahead ()
+{
+    if (scanner_at_end ())
+        return '\0';
+    return scanner.current[1];
+}
+
 char
 scanner_advance ()
 {
@@ -50,6 +72,34 @@ scanner_add_error (const char *message)
     };
 }
 
+void
+scanner_skip_whitespace ()
+{
+    while (1) {
+        switch (scanner_peek()) {
+            case ' ':
+            case '\r':
+            case '\t':
+                scanner_advance ();
+                break;
+            case '\n':
+                scanner.line++;
+                scanner_advance ();
+                break;
+            case '/':
+                if (scanner_peek_ahead () == '/')
+                    // Comment
+                    while (scanner_peek () != '\n' && !scanner_at_end ())
+                        scanner_advance ();
+                else
+                    return;
+                break;
+            default:
+                return;
+        }
+    }
+}
+
 Token
 scanner_add_token (TokenType token)
 {
@@ -62,6 +112,7 @@ scanner_add_token (TokenType token)
 Token
 scanner_scan_token ()
 {
+    scanner_skip_whitespace();
     if (scanner_at_end ())
         scanner_add_token (TOKEN_EOF);
     char c = scanner_advance ();
