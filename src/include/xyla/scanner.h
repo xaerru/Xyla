@@ -30,13 +30,14 @@ typedef enum {
     // Keywords.
     TOKEN_AND,
     TOKEN_CLASS,
-    TOKEN_WHEN,
     TOKEN_FALSE,
+    TOKEN_IN,
     TOKEN_LOOP,
     TOKEN_NIL,
     TOKEN_OR,
     TOKEN_RETURN,
     TOKEN_TRUE,
+    TOKEN_WHEN,
 
     TOKEN_ERROR,
     TOKEN_EOF,

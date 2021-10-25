@@ -40,7 +40,11 @@ scanner_match (char expected)
 {
     if (scanner_at_end ())
         return false;
-    return *scanner.current == expected;
+    if (*scanner.current != expected)
+        return false;
+
+    scanner.current++;
+    return true;
 }
 
 char
@@ -62,6 +66,15 @@ scanner_advance ()
 {
     scanner.current++;
     return scanner.current[-1];
+}
+
+Token
+scanner_create_token (TokenType token)
+{
+    return (Token){ .type = token,
+                    .start = scanner.start,
+                    .length = (int)(scanner.current - scanner.start),
+                    .line = scanner.line };
 }
 
 Token
@@ -99,16 +112,6 @@ scanner_skip_whitespace ()
         }
     }
 }
-
-Token
-scanner_create_token (TokenType token)
-{
-    return (Token){ .type = token,
-                    .start = scanner.start,
-                    .length = scanner.current - scanner.start,
-                    .line = scanner.line };
-}
-
 Token
 scanner_type_string ()
 {
@@ -137,13 +140,74 @@ scanner_type_number ()
 
     return scanner_create_token (TOKEN_NUMBER);
 }
+
+TokenType
+scanner_keyword (int start, int length, const char *rest, TokenType type)
+{
+    if (scanner.current - scanner.start == start + length
+        && memcmp (scanner.start + start, rest, length) == 0)
+        return type;
+
+    return TOKEN_IDENTIFIER;
+}
+
+TokenType
+scanner_identifier ()
+{
+    switch (scanner.start[0]) {
+        case 'a':
+            return scanner_keyword (1, 2, "nd", TOKEN_AND);
+        case 'c':
+            return scanner_keyword (1, 4, "lass", TOKEN_CLASS);
+        case 'f':
+            if (scanner.current - scanner.start > 1)
+                switch (scanner.start[1]) {
+                    case 'a':
+                        return scanner_keyword (2, 3, "lse", TOKEN_FALSE);
+                }
+            break;
+        case 'i':
+            return scanner_keyword (1, 1, "n", TOKEN_IN);
+        case 'n':
+            return scanner_keyword (1, 2, "il", TOKEN_NIL);
+        case 'o':
+            return scanner_keyword (1, 1, "r", TOKEN_OR);
+        case 'r':
+            return scanner_keyword (1, 5, "eturn", TOKEN_RETURN);
+        case 't':
+            if (scanner.current - scanner.start > 1)
+                switch (scanner.start[1]) {
+                    case 'r':
+                        return scanner_keyword (2, 2, "ue", TOKEN_TRUE);
+                }
+            break;
+        case 'l':
+            return scanner_keyword (1, 3, "oop", TOKEN_LOOP);
+        case 'w':
+            return scanner_keyword (1, 3, "hen", TOKEN_WHEN);
+    }
+
+    return TOKEN_IDENTIFIER;
+}
+
+Token
+scanner_type_keyword ()
+{
+    while (is_alpha (scanner_peek ()) || is_digit (scanner_peek ()))
+        scanner_advance ();
+    return scanner_create_token (scanner_identifier ());
+}
+
 Token
 scanner_scan_token ()
 {
     scanner_skip_whitespace ();
+    scanner.start = scanner.current;
+    char c = scanner_advance ();
     if (scanner_at_end ())
         return scanner_create_token (TOKEN_EOF);
-    char c = scanner_advance ();
+    if (is_alpha (c))
+        return scanner_type_keyword ();
     if (is_digit (c))
         return scanner_type_number ();
     switch (c) {
@@ -157,6 +221,14 @@ scanner_scan_token ()
         SCAN_SINGLE ('+', TOKEN_PLUS);
         SCAN_SINGLE (';', TOKEN_SEMICOLON);
         SCAN_SINGLE ('*', TOKEN_STAR);
+        case '!':
+            return scanner_create_token (scanner_match ('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
+        case '=':
+            return scanner_create_token (scanner_match ('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
+        case '<':
+            return scanner_create_token (scanner_match ('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
+        case '>':
+            return scanner_create_token (scanner_match ('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
         case '"':
             return scanner_type_string ();
         case '\'':
