@@ -43,3 +43,51 @@ scanner_make_token (TokenType token)
                     .line = scanner.line };
 }
 
+Token
+scanner_scan_token ()
+{
+    char c = scanner_advance ();
+    switch (c) {
+        case '(':
+            return scanner_make_token (TOKEN_LEFT_PAREN);
+            break;
+        case ')':
+            return scanner_make_token (TOKEN_RIGHT_PAREN);
+            break;
+        case '{':
+            return scanner_make_token (TOKEN_LEFT_BRACE);
+            break;
+        case '}':
+            return scanner_make_token (TOKEN_RIGHT_BRACE);
+            break;
+        case ',':
+            return scanner_make_token (TOKEN_COMMA);
+            break;
+        case '.':
+            return scanner_make_token (TOKEN_DOT);
+            break;
+        case '-':
+            return scanner_make_token (TOKEN_MINUS);
+            break;
+        case '+':
+            return scanner_make_token (TOKEN_PLUS);
+            break;
+        case ';':
+            return scanner_make_token (TOKEN_SEMICOLON);
+            break;
+        case '*':
+            return scanner_make_token (TOKEN_STAR);
+            break;
+    }
+    return scanner_make_token (TOKEN_EOF);
+}
+
+void
+scanner_scan_tokens ()
+{
+    while (!scanner_at_end ()) {
+        scanner.start = scanner.current;
+        Token t = scanner_scan_token ();
+        printf("%d\n", t.type);
+    }
+}
