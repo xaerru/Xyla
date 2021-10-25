@@ -5,8 +5,8 @@
 #include <string.h>
 
 typedef struct {
-    const char* start;
-    const char* current;
+    const char *start;
+    const char *current;
     int line;
 } Scanner;
 
@@ -60,35 +60,35 @@ scanner_scan_token ()
     char c = scanner_advance ();
     switch (c) {
         case '(':
-            return scanner_make_token (TOKEN_LEFT_PAREN);
+            return scanner_add_token (TOKEN_LEFT_PAREN);
             break;
         case ')':
-            return scanner_make_token (TOKEN_RIGHT_PAREN);
+            return scanner_add_token (TOKEN_RIGHT_PAREN);
             break;
         case '{':
-            return scanner_make_token (TOKEN_LEFT_BRACE);
+            return scanner_add_token (TOKEN_LEFT_BRACE);
             break;
         case '}':
-            return scanner_make_token (TOKEN_RIGHT_BRACE);
+            return scanner_add_token (TOKEN_RIGHT_BRACE);
             break;
         case ',':
-            return scanner_make_token (TOKEN_COMMA);
+            return scanner_add_token (TOKEN_COMMA);
             break;
         case '.':
-            return scanner_make_token (TOKEN_DOT);
+            return scanner_add_token (TOKEN_DOT);
             break;
         case '-':
-            return scanner_make_token (TOKEN_MINUS);
+            return scanner_add_token (TOKEN_MINUS);
             break;
         case '+':
-            return scanner_make_token (TOKEN_PLUS);
+            return scanner_add_token (TOKEN_PLUS);
             break;
         case ';':
-            return scanner_make_token (TOKEN_SEMICOLON);
+            return scanner_add_token (TOKEN_SEMICOLON);
             break;
         case '*':
-            return scanner_make_token (TOKEN_STAR);
+            return scanner_add_token (TOKEN_STAR);
             break;
     }
-    return scanner_make_token (TOKEN_EOF);
+    return scanner_add_token (TOKEN_EOF);
 }
