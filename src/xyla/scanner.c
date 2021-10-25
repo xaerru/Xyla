@@ -6,8 +6,7 @@
 
 #define SCAN_SINGLE(c, token)                                                                      \
     case c:                                                                                        \
-        return scanner_add_token (token);                                                          \
-        break;
+        return scanner_create_token (token);
 
 typedef struct {
     const char *start;
@@ -65,7 +64,7 @@ scanner_advance ()
 }
 
 Token
-scanner_add_error (const char *message)
+scanner_create_error (const char *message)
 {
     return (Token){
         .type = TOKEN_ERROR, .start = message, .length = strlen (message), .line = scanner.line
@@ -76,7 +75,7 @@ void
 scanner_skip_whitespace ()
 {
     while (1) {
-        switch (scanner_peek()) {
+        switch (scanner_peek ()) {
             case ' ':
             case '\r':
             case '\t':
@@ -101,7 +100,7 @@ scanner_skip_whitespace ()
 }
 
 Token
-scanner_add_token (TokenType token)
+scanner_create_token (TokenType token)
 {
     return (Token){ .type = token,
                     .start = scanner.start,
@@ -110,11 +109,25 @@ scanner_add_token (TokenType token)
 }
 
 Token
+scanner_type_string ()
+{
+    while ((scanner_peek () != '"' && scanner_peek () != '\'') && !scanner_at_end ()) {
+        if (scanner_peek () == '\n')
+            scanner.line++;
+        scanner_advance ();
+    }
+    if (scanner_at_end ())
+        return scanner_create_error ("String not terminated");
+    scanner_advance ();
+    return scanner_create_token (TOKEN_STRING);
+}
+
+Token
 scanner_scan_token ()
 {
-    scanner_skip_whitespace();
+    scanner_skip_whitespace ();
     if (scanner_at_end ())
-        scanner_add_token (TOKEN_EOF);
+        return scanner_create_token (TOKEN_EOF);
     char c = scanner_advance ();
     switch (c) {
         SCAN_SINGLE ('(', TOKEN_LEFT_PAREN);
@@ -127,6 +140,10 @@ scanner_scan_token ()
         SCAN_SINGLE ('+', TOKEN_PLUS);
         SCAN_SINGLE (';', TOKEN_SEMICOLON);
         SCAN_SINGLE ('*', TOKEN_STAR);
+        case '"':
+            return scanner_type_string ();
+        case '\'':
+            return scanner_type_string ();
     }
-    return scanner_add_error ("Invalid token");
+    return scanner_create_error ("Invalid token");
 }
