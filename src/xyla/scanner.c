@@ -38,7 +38,15 @@ scanner_advance ()
 }
 
 Token
-scanner_make_token (TokenType token)
+scanner_add_error (const char *message)
+{
+    return (Token){
+        .type = TOKEN_ERROR, .start = message, .length = strlen (message), .line = scanner.line
+    };
+}
+
+Token
+scanner_add_token (TokenType token)
 {
     return (Token){ .type = token,
                     .start = scanner.start,
