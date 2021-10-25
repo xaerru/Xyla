@@ -18,7 +18,7 @@ run (char *file)
             printf ("   | ");
         }
         printf ("%2d '%.*s'\n", token.type, token.length, token.start);
-        if (token.type == TOKEN_EOF)
+        if (token.type == TOKEN_EOF || token.type == TOKEN_ERROR)
             break;
     }
 }

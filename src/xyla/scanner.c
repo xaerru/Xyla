@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define SCAN_SINGLE(c, token)                                                                      \
+    case c:                                                                                        \
+        return scanner_add_token (token);                                                          \
+        break;
+
 typedef struct {
     const char *start;
     const char *current;
@@ -57,38 +62,20 @@ scanner_add_token (TokenType token)
 Token
 scanner_scan_token ()
 {
+    if (scanner_at_end ())
+        scanner_add_token (TOKEN_EOF);
     char c = scanner_advance ();
     switch (c) {
-        case '(':
-            return scanner_add_token (TOKEN_LEFT_PAREN);
-            break;
-        case ')':
-            return scanner_add_token (TOKEN_RIGHT_PAREN);
-            break;
-        case '{':
-            return scanner_add_token (TOKEN_LEFT_BRACE);
-            break;
-        case '}':
-            return scanner_add_token (TOKEN_RIGHT_BRACE);
-            break;
-        case ',':
-            return scanner_add_token (TOKEN_COMMA);
-            break;
-        case '.':
-            return scanner_add_token (TOKEN_DOT);
-            break;
-        case '-':
-            return scanner_add_token (TOKEN_MINUS);
-            break;
-        case '+':
-            return scanner_add_token (TOKEN_PLUS);
-            break;
-        case ';':
-            return scanner_add_token (TOKEN_SEMICOLON);
-            break;
-        case '*':
-            return scanner_add_token (TOKEN_STAR);
-            break;
+        SCAN_SINGLE ('(', TOKEN_LEFT_PAREN);
+        SCAN_SINGLE (')', TOKEN_RIGHT_PAREN);
+        SCAN_SINGLE ('{', TOKEN_RIGHT_BRACE);
+        SCAN_SINGLE ('}', TOKEN_RIGHT_BRACE);
+        SCAN_SINGLE (',', TOKEN_COMMA);
+        SCAN_SINGLE ('.', TOKEN_DOT);
+        SCAN_SINGLE ('-', TOKEN_MINUS);
+        SCAN_SINGLE ('+', TOKEN_PLUS);
+        SCAN_SINGLE (';', TOKEN_SEMICOLON);
+        SCAN_SINGLE ('*', TOKEN_STAR);
     }
-    return scanner_add_token (TOKEN_EOF);
+    return scanner_add_error ("Invalid token");
 }
