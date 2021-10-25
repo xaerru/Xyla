@@ -5,33 +5,36 @@
 #include <string.h>
 
 typedef struct {
-    int start;
-    int current;
+    const char* start;
+    const char* current;
     int line;
 } Scanner;
 
 Scanner scanner;
-const char* source;
+const char *source;
+Token *tokens;
 
 void
 scanner_new (const char *file)
 {
-    scanner.start = 0;
-    scanner.current = 0;
+    scanner.start = file;
+    scanner.current = file;
     scanner.line = 1;
     source = file;
+    tokens = malloc (sizeof (Token));
 }
 
 bool
 scanner_at_end ()
 {
-    return scanner.current == strlen (source);
+    return *scanner.current == '\0';
 }
 
 char
 scanner_advance ()
 {
-    return source[scanner.current++];
+    scanner.current++;
+    return scanner.current[-1];
 }
 
 Token
@@ -80,14 +83,4 @@ scanner_scan_token ()
             break;
     }
     return scanner_make_token (TOKEN_EOF);
-}
-
-void
-scanner_scan_tokens ()
-{
-    while (!scanner_at_end ()) {
-        scanner.start = scanner.current;
-        Token t = scanner_scan_token ();
-        printf("%d\n", t.type);
-    }
 }
