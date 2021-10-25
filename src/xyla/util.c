@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sysexits.h>
@@ -31,4 +32,16 @@ read_file (const char *path)
 
     fclose (file);
     return buffer;
+}
+
+bool
+is_digit (char c)
+{
+    return c >= '0' && c <= '9';
+}
+
+bool
+is_alpha (char c)
+{
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
