@@ -1,6 +1,6 @@
 CC=gcc
 TARGET=build/xyla
-CFLAGS=-Wall -Werror -Isrc/include
+CFLAGS=-Wall -Werror -Ofast -Isrc/include
 
 .PHONY: default all clean
 
