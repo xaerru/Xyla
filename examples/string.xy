@@ -1,0 +1,9 @@
+a = "double quote" // comment
+b = 'single quote' 
+// another comment
+c = "multi
+line 
+double"
+d = 'multi
+line
+single'
