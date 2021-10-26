@@ -10,13 +10,11 @@
     {                                                                                              \
         type, scanner.start, (int)(scanner.current - scanner.start), scanner.line                  \
     }
-
 #define CREATE_ERR_TOKEN(message)                                                                  \
     (Token)                                                                                        \
     {                                                                                              \
         TOKEN_ERROR, message, strlen (message), scanner.line                                       \
     }
-
 #define SCAN_SINGLE(c, token)                                                                      \
     case c:                                                                                        \
         return CREATE_TOKEN (token);
@@ -37,13 +35,13 @@ scanner_new (const char *file)
     scanner.line = 1;
 }
 
-bool
+static inline bool
 scanner_eof ()
 {
     return *scanner.current == '\0';
 }
 
-bool
+static inline bool
 scanner_match (char expected)
 {
     if (scanner_eof ())
@@ -55,13 +53,13 @@ scanner_match (char expected)
     return true;
 }
 
-char
+static inline char
 scanner_peek ()
 {
     return *scanner.current;
 }
 
-char
+static inline char
 scanner_peek_ahead ()
 {
     if (scanner_eof ())
@@ -69,14 +67,14 @@ scanner_peek_ahead ()
     return scanner.current[1];
 }
 
-char
+static inline char
 scanner_next ()
 {
     scanner.current++;
     return scanner.current[-1];
 }
 
-void
+static void
 scanner_skip_whitespace ()
 {
     while (1) {
@@ -103,7 +101,8 @@ scanner_skip_whitespace ()
         }
     }
 }
-Token
+
+static Token
 scanner_type_string ()
 {
     while ((scanner_peek () != '"' && scanner_peek () != '\'') && !scanner_eof ()) {
@@ -117,7 +116,7 @@ scanner_type_string ()
     return CREATE_TOKEN (TOKEN_STRING);
 }
 
-Token
+static Token
 scanner_type_number ()
 {
     while (is_digit ((scanner_peek ())))
@@ -132,7 +131,7 @@ scanner_type_number ()
     return CREATE_TOKEN (TOKEN_NUMBER);
 }
 
-TokenType
+static TokenType
 scanner_keyword (int start, int length, const char *rest, TokenType type)
 {
     if (scanner.current - scanner.start == start + length
@@ -142,7 +141,7 @@ scanner_keyword (int start, int length, const char *rest, TokenType type)
     return TOKEN_IDENTIFIER;
 }
 
-TokenType
+static TokenType
 scanner_identifier ()
 {
     switch (scanner.start[0]) {
@@ -181,7 +180,7 @@ scanner_identifier ()
     return TOKEN_IDENTIFIER;
 }
 
-Token
+static Token
 scanner_type_keyword ()
 {
     while (is_alpha (scanner_peek ()) || is_digit (scanner_peek ()))
