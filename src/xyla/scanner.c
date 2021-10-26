@@ -17,7 +17,6 @@ typedef struct {
 
 Scanner scanner;
 const char *source;
-Token *tokens;
 
 void
 scanner_new (const char *file)
@@ -26,7 +25,6 @@ scanner_new (const char *file)
     scanner.current = file;
     scanner.line = 1;
     source = file;
-    tokens = malloc (sizeof (Token));
 }
 
 bool
