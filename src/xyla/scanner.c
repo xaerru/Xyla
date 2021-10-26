@@ -26,7 +26,7 @@ scanner_new (const char *file)
 }
 
 bool
-scanner_at_end ()
+scanner_eof ()
 {
     return *scanner.current == '\0';
 }
@@ -34,7 +34,7 @@ scanner_at_end ()
 bool
 scanner_match (char expected)
 {
-    if (scanner_at_end ())
+    if (scanner_eof ())
         return false;
     if (*scanner.current != expected)
         return false;
@@ -52,13 +52,13 @@ scanner_peek ()
 char
 scanner_peek_ahead ()
 {
-    if (scanner_at_end ())
+    if (scanner_eof ())
         return '\0';
     return scanner.current[1];
 }
 
 char
-scanner_advance ()
+scanner_next ()
 {
     scanner.current++;
     return scanner.current[-1];
@@ -89,17 +89,17 @@ scanner_skip_whitespace ()
             case ' ':
             case '\r':
             case '\t':
-                scanner_advance ();
+                scanner_next ();
                 break;
             case '\n':
                 scanner.line++;
-                scanner_advance ();
+                scanner_next ();
                 break;
             case '/':
                 if (scanner_peek_ahead () == '/')
                     // Comment
-                    while (scanner_peek () != '\n' && !scanner_at_end ())
-                        scanner_advance ();
+                    while (scanner_peek () != '\n' && !scanner_eof ())
+                        scanner_next ();
                 else
                     return;
                 break;
@@ -111,14 +111,14 @@ scanner_skip_whitespace ()
 Token
 scanner_type_string ()
 {
-    while ((scanner_peek () != '"' && scanner_peek () != '\'') && !scanner_at_end ()) {
+    while ((scanner_peek () != '"' && scanner_peek () != '\'') && !scanner_eof ()) {
         if (scanner_peek () == '\n')
             scanner.line++;
-        scanner_advance ();
+        scanner_next ();
     }
-    if (scanner_at_end ())
+    if (scanner_eof ())
         return scanner_create_error ("String not terminated");
-    scanner_advance ();
+    scanner_next ();
     return scanner_create_token (TOKEN_STRING);
 }
 
@@ -126,12 +126,12 @@ Token
 scanner_type_number ()
 {
     while (is_digit ((scanner_peek ())))
-        scanner_advance ();
+        scanner_next ();
 
     if (scanner_peek () == '.' && is_digit (scanner_peek_ahead ())) {
-        scanner_advance ();
+        scanner_next ();
         while (is_digit (scanner_peek ()))
-            scanner_advance ();
+            scanner_next ();
     }
 
     return scanner_create_token (TOKEN_NUMBER);
@@ -190,7 +190,7 @@ Token
 scanner_type_keyword ()
 {
     while (is_alpha (scanner_peek ()) || is_digit (scanner_peek ()))
-        scanner_advance ();
+        scanner_next ();
     return scanner_create_token (scanner_identifier ());
 }
 
@@ -199,8 +199,8 @@ scanner_scan_token ()
 {
     scanner_skip_whitespace ();
     scanner.start = scanner.current;
-    char c = scanner_advance ();
-    if (scanner_at_end ())
+    char c = scanner_next ();
+    if (scanner_eof ())
         return scanner_create_token (TOKEN_EOF);
     if (is_alpha (c))
         return scanner_type_keyword ();
