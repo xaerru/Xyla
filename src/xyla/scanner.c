@@ -16,7 +16,6 @@ typedef struct {
 } Scanner;
 
 Scanner scanner;
-const char *source;
 
 void
 scanner_new (const char *file)
@@ -24,7 +23,6 @@ scanner_new (const char *file)
     scanner.start = file;
     scanner.current = file;
     scanner.line = 1;
-    source = file;
 }
 
 bool
