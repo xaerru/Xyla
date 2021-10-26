@@ -5,9 +5,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define CREATE_TOKEN(type)                                                                         \
+    (Token)                                                                                        \
+    {                                                                                              \
+        type, scanner.start, (int)(scanner.current - scanner.start), scanner.line                  \
+    }
+
+#define CREATE_ERR_TOKEN(message)                                                                  \
+    (Token)                                                                                        \
+    {                                                                                              \
+        TOKEN_ERROR, message, strlen (message), scanner.line                                       \
+    }
+
 #define SCAN_SINGLE(c, token)                                                                      \
     case c:                                                                                        \
-        return scanner_create_token (token);
+        return CREATE_TOKEN (token);
 
 typedef struct {
     const char *start;
@@ -64,23 +76,6 @@ scanner_next ()
     return scanner.current[-1];
 }
 
-Token
-scanner_create_token (TokenType token)
-{
-    return (Token){ .type = token,
-                    .start = scanner.start,
-                    .length = (int)(scanner.current - scanner.start),
-                    .line = scanner.line };
-}
-
-Token
-scanner_create_error (const char *message)
-{
-    return (Token){
-        .type = TOKEN_ERROR, .start = message, .length = strlen (message), .line = scanner.line
-    };
-}
-
 void
 scanner_skip_whitespace ()
 {
@@ -117,9 +112,9 @@ scanner_type_string ()
         scanner_next ();
     }
     if (scanner_eof ())
-        return scanner_create_error ("String not terminated");
+        return CREATE_ERR_TOKEN ("String not terminated");
     scanner_next ();
-    return scanner_create_token (TOKEN_STRING);
+    return CREATE_TOKEN (TOKEN_STRING);
 }
 
 Token
@@ -134,7 +129,7 @@ scanner_type_number ()
             scanner_next ();
     }
 
-    return scanner_create_token (TOKEN_NUMBER);
+    return CREATE_TOKEN (TOKEN_NUMBER);
 }
 
 TokenType
@@ -191,7 +186,7 @@ scanner_type_keyword ()
 {
     while (is_alpha (scanner_peek ()) || is_digit (scanner_peek ()))
         scanner_next ();
-    return scanner_create_token (scanner_identifier ());
+    return CREATE_TOKEN (scanner_identifier ());
 }
 
 Token
@@ -201,7 +196,7 @@ scanner_scan_token ()
     scanner.start = scanner.current;
     char c = scanner_next ();
     if (scanner_eof ())
-        return scanner_create_token (TOKEN_EOF);
+        return CREATE_TOKEN (TOKEN_EOF);
     if (is_alpha (c))
         return scanner_type_keyword ();
     if (is_digit (c))
@@ -218,17 +213,17 @@ scanner_scan_token ()
         SCAN_SINGLE (';', TOKEN_SEMICOLON);
         SCAN_SINGLE ('*', TOKEN_STAR);
         case '!':
-            return scanner_create_token (scanner_match ('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
+            return CREATE_TOKEN (scanner_match ('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
         case '=':
-            return scanner_create_token (scanner_match ('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
+            return CREATE_TOKEN (scanner_match ('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
         case '<':
-            return scanner_create_token (scanner_match ('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
+            return CREATE_TOKEN (scanner_match ('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
         case '>':
-            return scanner_create_token (scanner_match ('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+            return CREATE_TOKEN (scanner_match ('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
         case '"':
             return scanner_type_string ();
         case '\'':
             return scanner_type_string ();
     }
-    return scanner_create_error ("Invalid token");
+    return CREATE_ERR_TOKEN ("Invalid token");
 }
