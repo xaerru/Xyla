@@ -1,5 +1,5 @@
 CC:=gcc
-CFLAGS:=-Wall -Werror -std=gnu99 -Ofast -Isrc/include
+CFLAGS:=-Wall -Werror -std=gnu99 -Ofast -Iinclude
 
 TARGET:=build/bin/xyla
 BUILD_DIR:=build
