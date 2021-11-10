@@ -1,5 +1,5 @@
-#include "xyla/scanner.h"
-#include "xyla/util.h"
+#include "scanner.h"
+#include "util.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
